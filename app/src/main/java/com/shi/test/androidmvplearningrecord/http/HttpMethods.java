@@ -10,7 +10,8 @@ import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okio.Buffer;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -59,7 +60,7 @@ public class HttpMethods {
         retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
                 .addConverterFactory(CustomConverterFactory.create(new Gson()))
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl(HttpApi.WELFARE_HOST)
                 .build();
         welfareHttpApi = retrofit.create(HttpApi.class);

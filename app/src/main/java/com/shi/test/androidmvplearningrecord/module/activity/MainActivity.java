@@ -4,16 +4,20 @@ import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 import com.shi.test.androidmvplearningrecord.R;
+import com.shi.test.androidmvplearningrecord.bean.HttpResult;
 import com.shi.test.androidmvplearningrecord.bean.WelfarePhotoInfo;
 import com.shi.test.androidmvplearningrecord.bean.WelfarePhotoList;
 import com.shi.test.androidmvplearningrecord.http.HttpMethods;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-import rx.Subscriber;
-import rx.schedulers.Schedulers;
+import io.reactivex.schedulers.Schedulers;
 
 import java.util.List;
 
@@ -32,25 +36,31 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         rxPermissionTest();
 
-        HttpMethods.getInstance().getWelfareHttpApi().getWelfarePhoto(1)
+        HttpMethods.getInstance().getWelfareHttpApi().getWelfarePhoto(10)
                    .subscribeOn(Schedulers.io())
                    .unsubscribeOn(Schedulers.io())
-                   //.observeOn(AndroidSchedulers.mainThread())
-                   .subscribe(new Subscriber<WelfarePhotoList>() {
-                       @Override
-                       public void onCompleted() {
-
-                       }
-
+                   .observeOn(AndroidSchedulers.mainThread())
+                   .subscribe(new Observer<HttpResult<List<WelfarePhotoInfo>>>() {
                        @Override
                        public void onError(Throwable e) {
+                           Log.d("111111", "onError: "+e.getMessage());
+                       }
+
+                       @Override
+                       public void onComplete() {
 
                        }
 
                        @Override
-                       public void onNext(WelfarePhotoList welfarePhotoList) {
+                       public void onSubscribe(Disposable d) {
 
                        }
+
+                       @Override
+                       public void onNext(HttpResult<List<WelfarePhotoInfo>> listHttpResult) {
+//                           Log.d("111111", "onNext: "+listHttpResult.getParams().size());
+                       }
+
                    });
     }
     private void rxPermissionTest() {

@@ -1,10 +1,16 @@
 package com.shi.test.androidmvplearningrecord.http;
 
+import com.shi.test.androidmvplearningrecord.bean.HttpResult;
+import com.shi.test.androidmvplearningrecord.bean.WelfarePhotoInfo;
 import com.shi.test.androidmvplearningrecord.bean.WelfarePhotoList;
+
+
+import java.util.List;
+
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Path;
-import rx.Observable;
 
 /**
   *
@@ -26,5 +32,5 @@ public interface HttpApi {
      */
     @Headers(HttpMethods.CACHE_CONTROL_NETWORK)
     @GET("/api/data/福利/10/{page}")
-    Observable<WelfarePhotoList> getWelfarePhoto(@Path("page") int page);
+    Observable<HttpResult<List<WelfarePhotoInfo>> > getWelfarePhoto(@Path("page") int page);
 }
