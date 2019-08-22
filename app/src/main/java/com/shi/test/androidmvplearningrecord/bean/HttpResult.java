@@ -3,11 +3,14 @@ package com.shi.test.androidmvplearningrecord.bean;
 public class HttpResult<T> {
 
     /**
-     * error : false
+     * 实体类json解析，具体外层信息，具体改
+     * author 施镇杰
+     * email 452239676@qq.com
+     * created 2019/8/21 下午6:27
      */
-
     private boolean error;
-    private T params;
+    private T results;
+
     public boolean isError() {
         return error;
     }
@@ -16,11 +19,18 @@ public class HttpResult<T> {
         this.error = error;
     }
 
-    public T getParams() {
-        return params;
+    public T getResults() {
+        return results;
     }
 
-    public void setParams(T params) {
-        this.params = params;
+    public void setResults(T results) {
+        this.results = results;
+    }
+    @Override
+    public String toString() {
+        return "HttpResult{" +
+               "error=" + error +
+               ", results=" + results +
+               '}';
     }
 }

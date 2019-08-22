@@ -4,6 +4,7 @@ package com.shi.test.androidmvplearningrecord.http.gson;
 import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
+import com.shi.test.androidmvplearningrecord.bean.HttpResult;
 import com.shi.test.androidmvplearningrecord.module.base.BaseResult;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
@@ -31,23 +32,23 @@ final class CustomResponseBodyConverter<T> implements Converter<ResponseBody, T>
     public T convert(ResponseBody value) throws IOException {
 
         String body = value.string();
-        Log.d("body:", body);
-        BaseResult resultResponse = gson.fromJson(body, BaseResult.class);
+        Log.d("body:----", body);
+        HttpResult resultResponse = gson.fromJson(body, HttpResult.class);
         if (resultResponse == null) {
             throw new NoReturnException(1000, "");//空返回
         } else {
-            if ("OK".equals(resultResponse.getResult()) || resultResponse.getCode() == 200 || resultResponse
-                                                                                                      .getCode() == 201 || resultResponse
-                                                                                                                                   .getCode() == 202) {
+            //if ("OK".equals(resultResponse.getResult()) || resultResponse.getCode() == 200 || resultResponse
+            //                                                                                          .getCode() == 201 || resultResponse
+            //                                                                                                                       .getCode() == 202) {
 
                 try {
                     return adapter.fromJson(body);
                 } finally {
                     value.close();
                 }
-            } else {
-                throw new ResultException(resultResponse.getCode(), resultResponse.getMsg().toString());
-            }
+            //} else {
+            //    throw new ResultException(resultResponse.getCode(), resultResponse.getMsg().toString());
+            //}
         }
     }
 }

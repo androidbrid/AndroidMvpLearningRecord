@@ -32,5 +32,5 @@ public interface HttpApi {
      */
     @Headers(HttpMethods.CACHE_CONTROL_NETWORK)
     @GET("/api/data/福利/10/{page}")
-    Observable<HttpResult<List<WelfarePhotoInfo>> > getWelfarePhoto(@Path("page") int page);
+    Observable<HttpResult<List<WelfarePhotoInfo>>> getWelfarePhoto(@Path("page") int page);
 }

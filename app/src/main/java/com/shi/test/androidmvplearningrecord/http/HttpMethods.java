@@ -1,7 +1,7 @@
 package com.shi.test.androidmvplearningrecord.http;
 
 import android.support.annotation.NonNull;
-import com.google.gson.Gson;
+import android.util.Log;
 import com.orhanobut.logger.Logger;
 import com.shi.test.androidmvplearningrecord.MyApplication;
 import com.shi.test.androidmvplearningrecord.http.gson.CustomConverterFactory;
@@ -45,7 +45,7 @@ public class HttpMethods {
         Cache cache = new Cache(new File(MyApplication.getContext().getCacheDir(), "HttpCache"),
                 1024 * 1024 * 100);
         HttpLoggingInterceptor loggingInterceptor = new
-                HttpLoggingInterceptor(message -> Logger.d("header", message));
+                HttpLoggingInterceptor(message -> Log.d("header", message));
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder().cache(cache)
@@ -59,7 +59,7 @@ public class HttpMethods {
 
         retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
-                .addConverterFactory(CustomConverterFactory.create(new Gson()))
+                .addConverterFactory(CustomConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl(HttpApi.WELFARE_HOST)
                 .build();
@@ -71,62 +71,43 @@ public class HttpMethods {
      * 云端响应头拦截器，用来配置缓存策略
      * Dangerous interceptor that rewrites the server's cache-control header.
      */
-    private static final Interceptor sRewriteCacheControlInterceptor = new Interceptor() {
+    private static final Interceptor sRewriteCacheControlInterceptor = chain -> {
+        Request request = chain.request();
+        if (!NetUtil.isNetworkAvailable(MyApplication.getContext())) {
+            request = request.newBuilder().cacheControl(CacheControl.FORCE_CACHE).build();
+            Logger.e("no network");
+        }
+        Response originalResponse = chain.proceed(request);
 
-        @Override
-        public Response intercept(Chain chain) throws IOException {
-            Request request = chain.request();
-            if (!NetUtil.isNetworkAvailable(MyApplication.getContext())) {
-                request = request.newBuilder().cacheControl(CacheControl.FORCE_CACHE).build();
-                Logger.e("no network");
-            }
-            Response originalResponse = chain.proceed(request);
-
-            if (NetUtil.isNetworkAvailable(MyApplication.getContext())) {
-                //有网的时候读接口上的@Headers里的配置，你可以在这里进行统一的设置
-                String cacheControl = request.cacheControl().toString();
-                return originalResponse.newBuilder()
-                                       .header("Cache-Control", cacheControl)
-                                       .removeHeader("Pragma")
-                                       .build();
-            } else {
-                return originalResponse.newBuilder()
-                                       .header("Cache-Control", "public, " + CACHE_CONTROL_CACHE)
-                                       .removeHeader("Pragma")
-                                       .build();
-            }
+        if (NetUtil.isNetworkAvailable(MyApplication.getContext())) {
+            //有网的时候读接口上的@Headers里的配置，你可以在这里进行统一的设置
+            String cacheControl = request.cacheControl().toString();
+            return originalResponse.newBuilder()
+                                   .header("Cache-Control", cacheControl)
+                                   .removeHeader("Pragma")
+                                   .build();
+        } else {
+            return originalResponse.newBuilder()
+                                   .header("Cache-Control", "public, " + CACHE_CONTROL_CACHE)
+                                   .removeHeader("Pragma")
+                                   .build();
         }
     };
 
     /**
      * 打印返回的json数据拦截器
      */
-    private static final Interceptor sLoggingInterceptor = new Interceptor() {
-
-        @Override
-        public Response intercept(Chain chain) throws IOException {
-            final Request request = chain.request();
-            Buffer requestBuffer = new Buffer();
-            if (request.body() != null) {
-                request.body().writeTo(requestBuffer);
-            } else {
-                Logger.d("LogTAG", "request.body() == null");
-            }
-            //打印url信息
-            Logger.w(request.url() + (request.body() != null ? "?" + _parseParams(request.body(), requestBuffer) : ""));
-            final Response response = chain.proceed(request);
-
-            return response;
-        }
+    private static final Interceptor sLoggingInterceptor = chain -> {
+        Request originalRequest = chain.request();
+        Request.Builder requestBuilder = originalRequest.newBuilder()
+                                                        .addHeader("Accept-Encoding", "gzip")
+                                                        .addHeader("Accept", "application/json")
+                                                        .addHeader("Content-Type", "application/json; charset=utf-8")
+                                                        .method(originalRequest.method(), originalRequest.body());
+        //requestBuilder.addHeader("Authorization", "Bearer " + BaseConstant.TOKEN);//添加请求头信息，服务器进行token有效性验证
+        Request request = requestBuilder.build();
+        return chain.proceed(request);
     };
-
-    @NonNull
-    private static String _parseParams(RequestBody body, Buffer requestBuffer) throws UnsupportedEncodingException {
-        if (body.contentType() != null && !body.contentType().toString().contains("multipart")) {
-            return URLDecoder.decode(requestBuffer.readUtf8(), "UTF-8");
-        }
-        return "null";
-    }
 
     public HttpApi getWelfareHttpApi() {
         return welfareHttpApi;
