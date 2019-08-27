@@ -1,21 +1,21 @@
 package com.shi.test.androidmvplearningrecord.module.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+import butterknife.BindView;
 import com.shi.test.androidmvplearningrecord.R;
 import com.shi.test.androidmvplearningrecord.bean.HttpResult;
 import com.shi.test.androidmvplearningrecord.bean.WelfarePhotoInfo;
-import com.shi.test.androidmvplearningrecord.http.HttpMethods;
-import com.shi.test.androidmvplearningrecord.module.base.BaseSubScriber;
-import com.shi.test.androidmvplearningrecord.module.base.OnBaseListener;
+import com.shi.test.androidmvplearningrecord.module.base.BaseActivity;
+import com.shi.test.androidmvplearningrecord.module.model.TestModule;
+import com.shi.test.androidmvplearningrecord.module.presenter.TestPresenter;
+import com.shi.test.androidmvplearningrecord.module.view.TestView;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 import java.util.List;
 
@@ -25,39 +25,26 @@ import java.util.List;
  * email 452239676@qq.com
  * created 2019/8/20 下午3:36
  */
-public class MainActivity extends AppCompatActivity {
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        TextView tv = findViewById(R.id.tv);
+public class MainActivity extends BaseActivity<TestPresenter> implements TestView{
+    @BindView(R.id.tv)
+    TextView tv;
 
+    TestModule testModule;
+    @Override
+    protected int attachLayoutRes() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected void initViews() {
         rxPermissionTest();
 
-        HttpMethods.getInstance().getWelfareHttpApi().getWelfarePhoto(10)
-                   .subscribeOn(Schedulers.io())
-                   .unsubscribeOn(Schedulers.io())
-                   .observeOn(AndroidSchedulers.mainThread())
-                   .subscribe(new BaseSubScriber(new OnBaseListener<HttpResult<List<WelfarePhotoInfo>>>() {
-                       @Override
-                       public void onSuccess(HttpResult<List<WelfarePhotoInfo>> result) {
-                           String tv1 = "";
-                           for (int i = 0; i < result.getResults().size(); i++) {
-                               tv1 = tv1 + result.getResults().get(i).getUrl() + "\n";
-                           }
-                           tv.setText(tv1);
-                       }
+    }
 
-                       @Override
-                       public void onError(int code, String error) {
-                           Log.d("111111", "onError: " + error);
-                       }
-
-                       @Override
-                       public void onCompleted() {
-
-                       }
-                   }));
+    @Override
+    protected void initData() {
+        testModule=new TestModule(this);
+        testModule.providePhotoSetPresenter();
     }
 
     private void rxPermissionTest() {
@@ -70,5 +57,14 @@ public class MainActivity extends AppCompatActivity {
                      .show();
             }
         });
+    }
+
+    @Override
+    public void loadData(HttpResult<List<WelfarePhotoInfo>> listHttpResult) {
+        String tv1 = "";
+        for (int i = 0; i < listHttpResult.getResults().size(); i++) {
+            tv1 = tv1 + listHttpResult.getResults().get(i).getUrl() + "\n";
+        }
+        tv.setText(tv1);
     }
 }

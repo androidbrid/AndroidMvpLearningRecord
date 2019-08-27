@@ -40,7 +40,7 @@ public class HttpMethods {
     // 避免出现 HTTP 403 Forbidden，参考：http://stackoverflow.com/questions/13670692/403-forbidden-with-java-but-not-web-browser
     static final String AVOID_HTTP403_FORBIDDEN = "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
 
-    private HttpMethods() {
+    private HttpMethods(boolean isToken) {
         // 指定缓存路径,缓存大小100Mb
         Cache cache = new Cache(new File(MyApplication.getContext().getCacheDir(), "HttpCache"),
                 1024 * 1024 * 100);
@@ -51,7 +51,7 @@ public class HttpMethods {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().cache(cache)
                                                               .retryOnConnectionFailure(true)
                                                               .addInterceptor(loggingInterceptor)
-                                                              .addInterceptor(sLoggingInterceptor)
+                                                              .addInterceptor(getHeaderInterceptor(isToken))
                                                               .addInterceptor(sRewriteCacheControlInterceptor)
                                                               .addNetworkInterceptor(sRewriteCacheControlInterceptor)
                                                               .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
@@ -95,30 +95,35 @@ public class HttpMethods {
     };
 
     /**
-     * 打印返回的json数据拦截器
+     * 拦截器添加请求头
      */
-    private static final Interceptor sLoggingInterceptor = chain -> {
-        Request originalRequest = chain.request();
-        Request.Builder requestBuilder = originalRequest.newBuilder()
-                                                        .addHeader("Accept-Encoding", "gzip")
-                                                        .addHeader("Accept", "application/json")
-                                                        .addHeader("Content-Type", "application/json; charset=utf-8")
-                                                        .method(originalRequest.method(), originalRequest.body());
-        //requestBuilder.addHeader("Authorization", "Bearer " + BaseConstant.TOKEN);//添加请求头信息，服务器进行token有效性验证
-        Request request = requestBuilder.build();
-        return chain.proceed(request);
-    };
+    public static Interceptor getHeaderInterceptor(final boolean isToken) {
+        return chain -> {
+            Request originalRequest = chain.request();
+            Request.Builder requestBuilder = originalRequest.newBuilder()
+                                                            .addHeader("Accept-Encoding", "gzip")
+                                                            .addHeader("Accept", "application/json")
+                                                            .addHeader("Content-Type", "application/json; charset=utf-8")
+                                                            .method(originalRequest.method(), originalRequest.body());
+            if(isToken){
+                requestBuilder.addHeader("Authorization", "Bearer " );//添加请求头信息，服务器进行token有效性验证
+            }
+            Request request = requestBuilder.build();
+            return chain.proceed(request);
+        };
+    }
+
 
     public HttpApi getWelfareHttpApi() {
         return welfareHttpApi;
     }
 
 
-    public static HttpMethods getInstance() {
+    public static HttpMethods getInstance(boolean isToken) {
         if (instance == null) {
             synchronized (HttpMethods.class) {
                 if (instance == null) {
-                    instance = new HttpMethods();
+                    instance = new HttpMethods(isToken);
                 }
             }
         }

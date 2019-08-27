@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
-
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -43,9 +42,18 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.1'
 
+    implementation 'com.trello.rxlifecycle2:rxlifecycle:2.2.1'
+    implementation 'com.trello.rxlifecycle2:rxlifecycle-android:2.2.1'
+    implementation 'com.trello.rxlifecycle2:rxlifecycle-components:2.2.1'
+
     //Okhttp日志拦截
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.1'
     implementation 'com.orhanobut:logger:1.15'
     //动态权限获取
     implementation 'com.github.tbruyelle:RxPermissions:0.10.2'
+    //开源日志库Logger的使用
+    implementation 'com.orhanobut:logger:2.2.0'
+
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.2.1'
+    implementation 'com.jakewharton:butterknife:8.2.1'
 }

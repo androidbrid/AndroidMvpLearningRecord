@@ -2,12 +2,11 @@ package com.shi.test.androidmvplearningrecord.http;
 
 import com.shi.test.androidmvplearningrecord.bean.HttpResult;
 import com.shi.test.androidmvplearningrecord.bean.WelfarePhotoInfo;
-import com.shi.test.androidmvplearningrecord.bean.WelfarePhotoList;
-
-
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Path;
