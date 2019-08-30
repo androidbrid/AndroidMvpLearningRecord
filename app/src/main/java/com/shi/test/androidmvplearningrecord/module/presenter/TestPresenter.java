@@ -20,13 +20,14 @@ public class TestPresenter implements IBasePresenter {
     private final TestView mView;
 
     public TestPresenter(TestView view) {
-        mView = view;
+        this.mView = view;
     }
 
 
     @Override
-    public IBasePresenter getData() {
-        if(mView.isNetworkAvailable()){
+    public void getData() {
+        if (mView.isNetworkAvailable()) {
+            mView.showLoading();
             HttpMethods.getInstance(false).getWelfareHttpApi().getWelfarePhoto(10)
                        .subscribeOn(Schedulers.io())
                        .unsubscribeOn(Schedulers.io())
@@ -41,8 +42,7 @@ public class TestPresenter implements IBasePresenter {
 
                            @Override
                            public void onError(int code, String error) {
-                               //Toast.makeText(MainActivity.this, "code:" + code + "error:" + error,Toast.LENGTH_LONG).show();
-                               //Log.d("111111", "onError: " + error);
+                               mView.showError(error);
                            }
 
                            @Override
@@ -50,10 +50,8 @@ public class TestPresenter implements IBasePresenter {
                                mView.hideLoading();
                            }
                        }));
-        }else{
-
+        } else {
+            mView.showError("没有网络");
         }
-
-        return null;
     }
 }

@@ -1,0 +1,17 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:id="@+id/itemLayout"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:minHeight="80dp"
+              android:gravity="center">
+
+    <com.wang.avi.AVLoadingIndicatorView
+            android:layout_width="@dimen/qb_px_50"
+            android:layout_height="@dimen/qb_px_50"
+            android:id="@+id/indicator"
+            app:indicatorName="LineSpinFadeLoaderIndicator"
+            style="@style/AVLoadingIndicatorView"/>
+
+</LinearLayout>

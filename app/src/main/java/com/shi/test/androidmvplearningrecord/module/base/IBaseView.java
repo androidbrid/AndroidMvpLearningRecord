@@ -24,6 +24,11 @@ public interface IBaseView {
     boolean isNetworkAvailable();
 
     /**
+     * 错误提示
+     */
+    void showError(String s);
+
+    /**
      * 绑定生命周期
      * @param <T>
      * @return

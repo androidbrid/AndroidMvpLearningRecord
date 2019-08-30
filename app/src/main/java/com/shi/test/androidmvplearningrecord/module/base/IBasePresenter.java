@@ -10,6 +10,6 @@ package com.shi.test.androidmvplearningrecord.module.base;
 public interface IBasePresenter {
 
 
-    IBasePresenter getData();
+    void getData();
 
 }
