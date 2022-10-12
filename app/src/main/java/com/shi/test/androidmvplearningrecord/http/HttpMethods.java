@@ -1,6 +1,6 @@
 package com.shi.test.androidmvplearningrecord.http;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import com.orhanobut.logger.Logger;
 import com.shi.test.androidmvplearningrecord.MyApplication;
@@ -8,14 +8,10 @@ import com.shi.test.androidmvplearningrecord.http.gson.CustomConverterFactory;
 import com.shi.test.androidmvplearningrecord.utils.NetUtil;
 import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
-import okio.Buffer;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.concurrent.TimeUnit;
 
 /**
